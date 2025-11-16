@@ -66,11 +66,11 @@ def predict():
     try:
         home_team_api = data.get('home_team')
         away_team_api = data.get('away_team')
-        avg_h = float(str(data.get('avg_h')).replace(',', '.'))
-        avg_d = float(str(data.get('avg_d')).replace(',', '.'))
-        avg_a = float(str(data.get('avg_a')).replace(',', '.'))
-        avg_over_2_5 = float(str(data.get('avg_over_2_5')).replace(',', '.'))
-        avg_under_2_5 = float(str(data.get('avg_under_2_5')).replace(',', '.'))
+        avg_h = float(str(data.get('avg_h_odds')).replace(',', '.'))
+        avg_d = float(str(data.get('avg_d_odds')).replace(',', '.'))
+        avg_a = float(str(data.get('avg_a_odds')).replace(',', '.'))
+        avg_over_2_5 = float(str(data.get('avg_over_odds')).replace(',', '.'))
+        avg_under_2_5 = float(str(data.get('avg_under_odds')).replace(',', '.'))
 
         # Map team names
         home_team_model = team_mapping.get(home_team_api, home_team_api)
