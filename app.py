@@ -52,6 +52,10 @@ team_mapping = {
     "Holstein Kiel": "Holstein Kiel"
 }
 
+@app.route('/', methods=['GET'])
+def health():
+    return jsonify({"status": "healthy", "service": "Bundesliga ML API"})
+
 @app.route('/predict', methods=['POST'])
 def predict():
     if model_pipeline is None:
