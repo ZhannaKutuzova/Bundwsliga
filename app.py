@@ -66,6 +66,13 @@ def predict():
     try:
         home_team_api = data.get('home_team')
         away_team_api = data.get('away_team')
+        
+        # Проверяем что все поля присутствуют
+        required_fields = ['avg_h_odds', 'avg_d_odds', 'avg_a_odds', 'avg_over_odds', 'avg_under_odds']
+        for field in required_fields:
+            if data.get(field) is None:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+        
         avg_h = float(str(data.get('avg_h_odds')).replace(',', '.'))
         avg_d = float(str(data.get('avg_d_odds')).replace(',', '.'))
         avg_a = float(str(data.get('avg_a_odds')).replace(',', '.'))
