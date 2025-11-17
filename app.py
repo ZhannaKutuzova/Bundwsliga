@@ -62,38 +62,30 @@ def predict():
     try:
         home_team_api = data.get('home_team')
         away_team_api = data.get('away_team')
-        avg_h = float(str(data.get('avg_h')).replace(',', '.'))
-        avg_d = float(str(data.get('avg_d')).replace(',', '.'))
-        avg_a = float(str(data.get('avg_a')).replace(',', '.'))
-        avg_over_2_5 = float(str(data.get('avg_over_2_5')).replace(',', '.'))
-        avg_under_2_5 = float(str(data.get('avg_under_2_5')).replace(',', '.'))
+        
+        # Updated to use the keys from the user's provided request JSON
+        avg_h = float(str(data.get('avg_h_odds')).replace(',', '.')) if data.get('avg_h_odds') is not None else np.nan
+        avg_d = float(str(data.get('avg_d_odds')).replace(',', '.')) if data.get('avg_d_odds') is not None else np.nan
+        avg_a = float(str(data.get('avg_a_odds')).replace(',', '.')) if data.get('avg_a_odds') is not None else np.nan
+        avg_over_2_5 = float(str(data.get('avg_over_odds')).replace(',', '.')) if data.get('avg_over_odds') is not None else np.nan
+        avg_under_2_5 = float(str(data.get('avg_under_odds')).replace(',', '.')) if data.get('avg_under_odds') is not None else np.nan
 
         # Map team names
         home_team_model = team_mapping.get(home_team_api, home_team_api)
         away_team_model = team_mapping.get(away_team_api, away_team_api)
 
-        # Build input strictly as a one-row DataFrame with explicit columns
-        input_data = pd.DataFrame(
-            [[
-                home_team_model,
-                away_team_model,
-                avg_h,
-                avg_d,
-                avg_a,
-                avg_over_2_5,
-                avg_under_2_5,
-            ]],
-            columns=relevant_features,
-        )
+        # Explicitly create DataFrame with relevant_features as columns
+        input_data = pd.DataFrame([[home_team_model, away_team_model, avg_h, avg_d, avg_a, avg_over_2_5, avg_under_2_5]],
+                                  columns=relevant_features)
 
-        # Predict probabilities using the DataFrame directly
+        # Predict probabilities
         probabilities = model_pipeline.predict_proba(input_data)[0]
         prob_under = probabilities[UNDER_IDX]
         prob_over = probabilities[OVER_IDX]
 
         # Calculate EV
-        ev_over = (prob_over * (avg_over_2_5 - 1)) - (prob_under * 1) if avg_over_2_5 and avg_over_2_5 > 1 else -np.inf
-        ev_under = (prob_under * (avg_under_2_5 - 1)) - (prob_over * 1) if avg_under_2_5 and avg_under_2_5 > 1 else -np.inf
+        ev_over = (prob_over * (avg_over_2_5 - 1)) - (prob_under * 1) if not pd.isna(avg_over_2_5) and avg_over_2_5 > 1 else -np.inf
+        ev_under = (prob_under * (avg_under_2_5 - 1)) - (prob_over * 1) if not pd.isna(avg_under_2_5) and avg_under_2_5 > 1 else -np.inf
 
         recommendation = "No bet"
         bet_on = "None"
